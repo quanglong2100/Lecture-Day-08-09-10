@@ -33,8 +33,8 @@ Tôi đã xử lý một anomaly đặc thù liên quan đến ký tự ẩn BOM
 
 ## 4. Bằng chứng trước / sau (80–120 từ)
 
-Before: q_refund_window	Khách hàng có bao nhiêu ngày để yêu cầu hoàn tiền kể từ khi xác nhận đơn?	policy_refund_v4	Yêu cầu được gửi trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng.	yes	no		3
-After: q_refund_window	Khách hàng có bao nhiêu ngày để yêu cầu hoàn tiền kể từ khi xác nhận đơn?	policy_refund_v4	Yêu cầu được gửi trong vòng 14 ngày làm việc kể từ thời điểm xác nhận đơn hàng.	yes	yes		3
+q_refund_window	Khách hàng có bao nhiêu ngày để yêu cầu hoàn tiền kể từ khi xác nhận đơn?	policy_refund_v4	Yêu cầu được gửi trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng.	yes	no		3
+q_refund_window	Khách hàng có bao nhiêu ngày để yêu cầu hoàn tiền kể từ khi xác nhận đơn?	policy_refund_v4	Yêu cầu được gửi trong vòng 14 ngày làm việc kể từ thời điểm xác nhận đơn hàng.	yes	yes		3
 
 ---
 
