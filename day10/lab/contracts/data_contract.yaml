@@ -2,8 +2,8 @@
 # Sinh viên bổ sung owner, SLA freshness, và nguồn canonical.
 
 version: "1.0"
-dataset: "kb_chunk_export"
-owner_team: "__TODO__"
+dataset: "policy_export_dirty_v2"
+owner_team: "A2C401"
 
 schema_cleaned:
   chunk_id:
@@ -28,15 +28,44 @@ schema_cleaned:
 
 quality_rules:
   - id: "no_duplicate_chunk_text"
+    description: "Loại bỏ các đoạn văn bản trùng lặp sau khi đã chuẩn hóa (lowercase và trim khoảng trắng)"
     severity: "warn"
+    metric_impact: "Giảm kích thước Vector DB và tránh nhiễu kết quả Retrieval"
+
   - id: "no_stale_refund_window"
-    description: "Không được để chunk policy refund chứa cửa sổ 14 ngày (lệch so với v4 = 7 ngày)"
+    description: "Không được để chunk policy refund chứa cửa sổ 14 ngày (phải tự động fix thành 7 ngày)"
     severity: "halt"
+    metric_impact: "Đảm bảo tính chính xác pháp lý của thông tin hoàn tiền (Source of Truth)"
+
+  - id: "enforce_allowed_doc_ids"
+    description: "Chỉ chấp nhận các doc_id nằm trong allowlist (policy_refund_v4, sla_p1_2026, it_helpdesk_faq, hr_leave_policy)"
+    severity: "halt"
+    metric_impact: "Ngăn chặn dữ liệu lạ hoặc chưa phê duyệt đi vào hệ thống RAG"
+
+  - id: "hr_policy_versioning_2026"
+    description: "Quarantine các tài liệu hr_leave_policy có effective_date trước 2026-01-01"
+    severity: "warn"
+    metric_impact: "Tránh xung đột thông tin giữa các chính sách nhân sự cũ và mới"
+
+  - id: "min_chunk_length_20"
+    description: "Loại bỏ các đoạn văn bản có độ dài sau khi clean dưới 20 ký tự"
+    severity: "warn"
+    metric_impact: "Loại bỏ các đoạn text vụn, không đủ ngữ cảnh để AI xử lý"
+
+  - id: "pii_masking_internal_email"
+    description: "Tự động che (masking) các địa chỉ email có đuôi @company.internal"
+    severity: "info"
+    metric_impact: "Đảm bảo an toàn dữ liệu và tuân thủ bảo mật thông tin nội bộ"
+
+  - id: "bom_character_detection"
+    description: "Phát hiện và gắn nhãn [BOM detect] cho các ký tự Byte Order Mark ẩn"
+    severity: "info"
+    metric_impact: "Ngăn ngừa lỗi mã hóa (encoding) khi hiển thị hoặc nhúng (embedding) dữ liệu"
 
 freshness:
   measured_at: "publish"  # ingest | cleaned | publish
   sla_hours: 24
-  alert_channel: "__TODO__"
+  alert_channel: "igf"
 
 canonical_sources:
   - path: "data/docs/policy_refund_v4.txt"
