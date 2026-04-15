@@ -83,16 +83,19 @@ def clean_rows(
     cleaned: List[Dict[str, Any]] = []
     seq = 0
 
+    doc_content_map = {}
     for raw in rows:
         doc_id = raw.get("doc_id", "")
         text = raw.get("chunk_text", "")
         eff_raw = raw.get("effective_date", "")
         exported_at = raw.get("exported_at", "")
 
+        # 1. Unknown doc_id
         if doc_id not in ALLOWED_DOC_IDS:
             quarantine.append({**raw, "reason": "unknown_doc_id"})
             continue
-
+        
+        # 2. Normalize effective_date
         eff_norm, eff_err = _normalize_effective_date(eff_raw)
         if eff_err == "empty_effective_date":
             quarantine.append({**raw, "reason": "missing_effective_date"})
@@ -100,7 +103,8 @@ def clean_rows(
         if eff_err == "invalid_effective_date_format":
             quarantine.append({**raw, "reason": eff_err, "effective_date_raw": eff_raw})
             continue
-
+        
+        # 3. Stale HR Policy
         if doc_id == "hr_leave_policy" and eff_norm < "2026-01-01":
             quarantine.append(
                 {
@@ -110,17 +114,20 @@ def clean_rows(
                 }
             )
             continue
-
+        
+        # 4. Missing text
         if not text:
             quarantine.append({**raw, "reason": "missing_chunk_text"})
             continue
-
+                
+        # 6. Dup detection
         key = _norm_text(text)
         if key in seen_text:
             quarantine.append({**raw, "reason": "duplicate_chunk_text"})
             continue
         seen_text.add(key)
 
+        # 7. Refund rule (FIX)
         fixed_text = text
         if apply_refund_window_fix and doc_id == "policy_refund_v4":
             if "14 ngày làm việc" in fixed_text:
@@ -131,6 +138,20 @@ def clean_rows(
                 fixed_text += " [cleaned: stale_refund_window]"
 
         seq += 1
+        
+        # 8. CLEAN BOM (NEW RULE)
+        text_clean = text.replace('\ufeff', "[BOM detect]").strip().lower()
+
+        # 9. Filter too short text (NEW RULE)
+        if len(text_clean) < 20:
+            quarantine.append({**raw, "reason": "too_short_chunk_text"})
+            continue
+        
+        # 10. PII Masking
+        if "@company.internal" in fixed_text:
+            fixed_text = re.sub(r"[\w\.-]+@company\.internal", "[REDACTED_EMAIL]", fixed_text)
+            # Metric impact note: Enhances data privacy
+            
         cleaned.append(
             {
                 "chunk_id": _stable_chunk_id(doc_id, fixed_text, seq),
@@ -142,7 +163,6 @@ def clean_rows(
         )
 
     return cleaned, quarantine
-
 
 def write_cleaned_csv(path: Path, rows: List[Dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
