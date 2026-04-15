@@ -1,8 +1,8 @@
 # Báo Cáo Cá Nhân — Lab Day 10: Data Pipeline & Observability
 
-**Họ và tên:** ___________  
-**Vai trò:** Ingestion / Cleaning / Embed / Monitoring — ___________  
-**Ngày nộp:** ___________  
+**Họ và tên:** ****\_\_\_****  
+**Vai trò:** Ingestion / Cleaning / Embed / Monitoring — ****\_\_\_****  
+**Ngày nộp:** ****\_\_\_****  
 **Độ dài yêu cầu:** **400–650 từ** (ngắn hơn Day 09 vì rubric slide cá nhân ~10% — vẫn phải đủ bằng chứng)
 
 ---
@@ -21,11 +21,11 @@
 
 **Kết nối với thành viên khác:**
 
-_________________
+---
 
 **Bằng chứng (commit / comment trong code):**
 
-_________________
+---
 
 ---
 
@@ -33,7 +33,7 @@ _________________
 
 > VD: chọn halt vs warn, chiến lược idempotency, cách đo freshness, format quarantine.
 
-_________________
+---
 
 ---
 
@@ -41,7 +41,7 @@ _________________
 
 > Mô tả triệu chứng → metric/check nào phát hiện → fix.
 
-_________________
+---
 
 ---
 
@@ -49,7 +49,7 @@ _________________
 
 > Dán ngắn 2 dòng từ `before_after_eval.csv` hoặc tương đương; ghi rõ `run_id`.
 
-_________________
+---
 
 ---
 
@@ -57,4 +57,4 @@ _________________
 
 > Nếu có thêm 2 giờ — một việc cụ thể (không chung chung).
 
-_________________
+---
