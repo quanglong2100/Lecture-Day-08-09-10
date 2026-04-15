@@ -112,5 +112,49 @@ def run_expectations(cleaned_rows: List[Dict[str, Any]]) -> Tuple[List[Expectati
         )
     )
 
+    # E7: No dup chunk_text (New)
+    seen = set()
+    dup_count = 0
+
+    for r in cleaned_rows:
+        text = (r.get("chunk_text") or "").strip().lower()
+        if text in seen:
+            dup_count += 1
+        seen.add(text)
+
+    ok7 = dup_count == 0
+
+    results.append(
+        ExpectationResult(
+            "no_duplicate_chunk_text",
+            ok7,
+            "halt",
+            f"duplicate_count={dup_count}",
+        )
+    )
+
+    # E8: refund policy phải chứa "7 ngày làm việc" (strict positive check) (new)
+    refund_rows = [
+        r for r in cleaned_rows
+        if r.get("doc_id") == "policy_refund_v4"
+    ]
+
+    missing_7 = [
+        r for r in refund_rows
+        if "7 ngày làm việc" not in (r.get("chunk_text") or "")
+    ]
+
+    ok7 = len(missing_7) == 0 and len(refund_rows) > 0
+
+    results.append(
+        ExpectationResult(
+            "refund_must_be_7_days",
+            ok7,
+            "halt",
+            f"missing_7_count={len(missing_7)} total_refund_rows={len(refund_rows)}",
+        )
+    )
+
+    
     halt = any(not r.passed and r.severity == "halt" for r in results)
     return results, halt
